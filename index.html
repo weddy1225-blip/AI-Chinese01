@@ -4,51 +4,50 @@
   <base target="_top">
   <style>
     body { font-family: 'PingFang TC', 'Microsoft JhengHei', sans-serif; background-color: #eef2f7; display: flex; justify-content: center; padding: 20px; }
-    .card { background: white; width: 100%; max-width: 550px; padding: 30px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
-    h1 { color: #2c3e50; text-align: center; font-size: 24px; margin-bottom: 25px; }
+    .card { background: white; width: 100%; max-width: 580px; padding: 30px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+    h1 { color: #2c3e50; text-align: center; margin-bottom: 25px; }
     .step { display: none; }
     .active { display: block; animation: fadeIn 0.5s; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-    
     .instruction { background: #f8f9fa; border-left: 5px solid #3498db; padding: 12px; margin: 15px 0; font-size: 14px; color: #555; }
-    .text-content { background:#fff; border: 1px solid #eee; padding:20px; border-radius:8px; line-height: 1.8; font-size: 19px; margin-bottom: 10px; color: #2c3e50; }
-    
-    /* 第一關提示樣式 */
-    .hint-highlight { color: inherit; font-weight: inherit; transition: 0.3s; }
-    .hint-active { color: #e74c3c !important; font-weight: bold !important; text-decoration: underline; }
-    
+    .text-content-wrapper { position: relative; margin-bottom: 10px; }
+    .text-content { background:#fff; border: 1px solid #eee; padding:20px; border-radius:8px; line-height: 1.8; font-size: 19px; color: #2c3e50; }
+    .hint-small-btn { position: absolute; right: 10px; bottom: 10px; background: none; border: 1px solid #bdc3c7; color: #95a5a6; padding: 2px 8px; border-radius: 4px; font-size: 12px; cursor: pointer; }
     input[type="text"] { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 16px; }
-    .hint-btn { background: #95a5a6; color: white; border: none; padding: 8px 16px; border-radius: 5px; cursor: pointer; font-size: 13px; margin-bottom: 15px; }
-    
-    /* 第二關選項樣式 */
-    .option-btn { display: block; width: 100%; padding: 15px; margin: 12px 0; background: #fff; border: 2px solid #3498db; border-radius: 10px; cursor: pointer; text-align: left; font-size: 15px; transition: 0.2s; }
+    .next-btn { width: 100%; padding: 15px; background: #27ae60; color: white; border: none; border-radius: 10px; font-size: 18px; cursor: pointer; margin-top: 10px; }
+    .option-btn { display: block; width: 100%; padding: 15px; margin: 12px 0; background: #fff; border: 2px solid #3498db; border-radius: 10px; cursor: pointer; text-align: left; transition: 0.3s; }
     .option-btn:hover { background: #3498db; color: white; }
     
-    .next-btn { width: 100%; padding: 15px; background: #27ae60; color: white; border: none; border-radius: 10px; font-size: 18px; cursor: pointer; margin-top: 10px; }
-    
-    /* 報告顯示區 */
-    #report-box { white-space: pre-wrap; background: #2c3e50; color: #ecf0f1; padding: 25px; border-radius: 12px; font-family: 'Courier New', Courier, monospace; line-height: 1.7; font-size: 14px; margin-top: 15px; }
-    .loading { text-align: center; color: #7f8c8d; padding: 30px; font-style: italic; }
+    .result-badge { display: inline-block; padding: 3px 8px; border-radius: 4px; font-weight: bold; font-size: 14px; margin-right: 5px; }
+    .correct { background: #d4edda; color: #155724; }
+    .wrong { background: #f8d7da; color: #721c24; }
+    .answer-key { background: #fff3cd; border: 1px solid #ffeeba; padding: 15px; border-radius: 10px; margin-top: 20px; color: #856404; font-size: 14px; }
+    .comparison-item { margin-bottom: 12px; padding: 10px; background: rgba(255,255,255,0.6); border-radius: 6px; border: 1px dashed #ccc; }
+    .matched-sol { color: #27ae60; font-weight: bold; display: block; margin-top: 5px; font-size: 15px; }
+    .highlight-error { color: #e74c3c; font-weight: bold; background: #fdecea; padding: 2px 4px; border-radius: 4px; }
+    #report-box { display:none; margin-top:15px; background:#2c3e50; color:#ecf0f1; padding:20px; border-radius:10px; white-space:pre-wrap; font-family: monospace; line-height: 1.5; }
   </style>
 </head>
 <body>
 
 <div class="card">
-  <h1>🛡️ 文字修復大作戰</h1>
+  <h1 id="main-title">🛡️ 文字修復大作戰</h1>
 
   <div id="step0" class="step active">
-    <p>工程師你好，請輸入你的名字以連結系統：</p>
+    <p>工程師你好，請輸入名字以連結系統：</p>
     <input type="text" id="userName" placeholder="輸入名字...">
-    <button class="next-btn" onclick="initGame()">啟動修復系統</button>
+    <button class="next-btn" onclick="initGame()">啟動系統</button>
   </div>
 
   <div id="step1" class="step">
     <h3>第一關：字魔捉迷藏</h3>
-    <div class="instruction">任務：找出這段話中的 2 個「受感染的字」。</div>
-    <div class="text-content" id="s1-display"></div>
-    <button class="hint-btn" onclick="toggleHint()">🔍 獲取偵探提示</button>
-    <input type="text" id="s1_ans1" placeholder="請輸入第一個要修改的字">
-    <input type="text" id="s1_ans2" placeholder="請輸入第二個要修改的字">
+    <div class="instruction">任務：請輸入這段話中 2 個受感染文字的「正確字」。</div>
+    <div class="text-content-wrapper">
+      <div id="s1-display" class="text-content"></div>
+      <button class="hint-small-btn" id="hintBtn" onclick="showHint()">🔍 提示</button>
+    </div>
+    <input type="text" id="s1_ans1" placeholder="輸入第一個正確字">
+    <input type="text" id="s1_ans2" placeholder="輸入第二個正確字">
     <button class="next-btn" onclick="goStep(2)">修復並前進</button>
   </div>
 
@@ -61,122 +60,179 @@
   <div id="step3" class="step">
     <h3>第三關：標點符號定身術</h3>
     <div class="instruction" id="s3-q-text"></div>
-    <p>請輸入兩種不同的標點符號改法：</p>
-    <input type="text" id="s3_1" placeholder="請輸入改法一">
-    <input type="text" id="s3_2" placeholder="請輸入改法二">
-    <button class="next-btn" onclick="submitGame()">上傳終極修復數據</button>
+    <p style="font-size: 13px; color: #e67e22;">💡 提示：請輸入兩種不同的斷句方式（系統會自動識別語意）。</p>
+    <input type="text" id="s3_1" placeholder="改法一">
+    <input type="text" id="s3_2" placeholder="改法二">
+    <button class="next-btn" onclick="submitGame()">生成修復報告</button>
   </div>
 
   <div id="step4" class="step">
-    <h3>📊 文字修復報告</h3>
-    <div id="loading" class="loading">📡 正在傳輸修復數據至 AI 核心...</div>
-    <div id="report-box" style="display:none;"></div>
+    <h3 id="report-title">📊 任務修復掃描報告</h3>
+    
+    <div id="status-summary" style="margin-bottom: 20px; line-height: 2;"></div>
+
+    <div id="comparison-zone" class="answer-key" style="display:none;">
+      <strong>🧾 斷句判答與對應：</strong><hr>
+      <div id="s3-details"></div>
+    </div>
+
+    <div id="loading" style="text-align:center; padding:10px; font-size:14px; color:#666;">📡 正在連線 AI 核心...</div>
+    <div id="report-box"></div>
+
+    <div id="final-answers" class="answer-key" style="background:#e8f4fd; border-color:#d1e9fb; color:#2980b9; display:none;"></div>
+
     <button class="next-btn" onclick="location.reload()" style="background:#95a5a6;">重新啟動系統</button>
   </div>
 </div>
 
 <script>
-  // --- 完整題庫數據 ---
-  const lib1 = [
-    { text: "「假日到公園踢球，我累得滿頭大<span class='hint-highlight'>和</span>，坐在樹蔭下休息時，看著小鳥在枝頭上輕聲<span class='hint-highlight'>哥</span>唱。」" },
-    { text: "「這本書的故事內容非常精彩，讓我看得目不轉<span class='hint-highlight'>精</span>，完全<span class='hint-highlight'>忘</span>記了窗外正在下著大雨。」" },
-    { text: "「晚餐後，媽媽切了一盤多汁的水<span class='hint-highlight'>莉</span>，那甜美的滋味在舌尖散開，真是一件幸福的事<span class='hint-highlight'>請</span>。」" },
-    { text: "「老師教導我們要誠實守信，不可隨便撒<span class='hint-highlight'>惶</span>，這樣才能贏得別人的<span class='hint-highlight'>專</span>重與信任。」" },
-    { text: "「今天的作業真不少，我必須專心一<span class='hint-highlight'>至</span>地趕快寫完，才能在晚上準時收看電視節<span class='hint-highlight'>木</span>。」" },
-    { text: "「今天早晨天氣很好，我不緊感嘆時光<span class='hint-highlight'>留</span>逝得很快，看著蝴蝶在花叢中撥弄著花<span class='hint-highlight'>惢</span>，心情真好。」" }
-  ];
+const lib1 = [
+  { text: "這本書的故事內容非長精彩，讓我看得目不轉睛，完全忘記了窗外正在下著大語。", ans: ["長", "語"], correct: ["常", "雨"] },
+  { text: "今天的作業真不少，我必須專心一至地趕快寫完，才能在晚上準時收看電視節木。", ans: ["至", "木"], correct: ["志", "目"] },
+  { text: "老師教導我們要誠實守信，不可隨便撒惶，這樣才能贏得別人的專重與信任。", ans: ["惶", "專"], correct: ["謊", "尊"] },
+  { text: "請你在給他一次機會，別這麽慚忍。", ans: ["在", "慚"], correct: ["再", "殘"] },
+  { text: "哪怕在美的風璟，只要錯過，就回不來了。", ans: ["在", "璟"], correct: ["再", "景"] }
+];
 
-  const lib2 = [
-    { q: "小明在接力賽中雖然落後了，但他依然______，拼命向前衝，最後終於追上了對手。", opts: ["(A) 垂頭喪氣：形容失意沮喪的樣子。", "(B) 全力以赴：投入全部的力量去做。", "(C) 走馬看花：形容觀察不夠深入。"], ans: 1 },
-    { q: "姐姐的房間總是整理得______，所有的書本和玩具都擺放得整整齊齊。", opts: ["(A) 亂七八糟：形容毫無條理，非常混亂。", "(B) 井然有序：整齊且有次序的樣子。", "(C) 五顏六色：形容色彩鮮艷多樣。"], ans: 1 },
-    { q: "上課時，我們應該______地聽老師講課，才不會漏掉重要的知識。", opts: ["(A) 聚精會神：集中精神，專心一意。", "(B) 左右為難：形容陷入兩難的困境。", "(C) 興高采烈：形容情緒熱烈的樣子。"], ans: 0 },
-    { q: "學習知識不能______，必須每天不斷地累積，才能看到進步。", opts: ["(A) 半途而廢：事情做到一半就停止。", "(B) 守口如瓶：形容說話謹慎，嚴守秘密。", "(C) 歡天喜地：形容非常高興。"], ans: 0 },
-    { q: "連假期間，動物園裡______，到處都是來參觀的小朋友和家長。", opts: ["(A) 鴉雀無聲：形容非常安靜。", "(B) 守株待兔：比喻妄想不勞而獲。", "(C) 人山人海：形容聚集的人非常多。"], ans: 2 }
-  ];
+const lib2 = [
+  { q: "這部電影情節緊湊、內容精彩，讓觀眾看得______。", opts: ["(A) 昏昏欲睡", "(B) 津津有味", "(C) 不情不願"], ans: 1, sol: "津津有味" },
+  { q: "比賽進入最後關頭，雙方實力相當，情勢變得十分______。", opts: ["(A) 一丘之貉", "(B) 膠著不下", "(C) 風平浪靜"], ans: 1, sol: "膠著不下" },
+  { q: "小華準備考試時非常專心，完全沒有受到外界干擾，真是______。", opts: ["(A) 心無旁騖", "(B) 三心二意", "(C) 心不在焉"], ans: 0, sol: "心無旁騖" },
+  { q: "看到同學遇到困難，他立刻伸出援手，表現得非常______。", opts: ["(A) 見死不救", "(B) 熱心助人", "(C) 袖手旁觀"], ans: 1, sol: "熱心助人" },
+  { q: "他做事總是馬馬虎虎，從不仔細檢查，難怪常常出錯，真是______。", opts: ["(A) 粗心大意", "(B) 小心謹慎", "(C) 一絲不苟"], ans: 0, sol: "粗心大意" },
+  { q: "這本小說內容精彩，劇情發展令人難以預料，真是______。", opts: ["(A) 平淡無奇", "(B) 引人入勝", "(C) 枯燥乏味"], ans: 1, sol: "引人入勝" }
+];
 
-  const lib3 = ["下雨天留客天留我不留", "行人等不得在此隨地便溺"];
+const lib3 = [
+  { 
+    q: "下雨天留客天留我不留", 
+    solutions: [
+      "下雨天留客，天留我不留。", "下雨天留客，天留我？不留。", "下雨天留客，天留我不？留。",
+      "下雨，天留客；天留我不留！", "下雨天，留客天，留我？不留。", "下雨天，留客天，留我不？留。",
+      "下雨天，留客天，留我不留？"
+    ]
+  },
+  {
+    q: "行人等不得在此便溺",
+    solutions: ["行人等，不得在此便溺。", "行人，等不得，在此便溺。"]
+  }
+];
 
-  // 儲存學生進度與答案
-  let studentData = { 
-    name: "", 
-    s1_text: "", s1_ans1: "", s2_ans2: "", 
-    s2_q: "", s2_ans: "", s2_correct: false, 
-    s3_text: "" 
-  };
+let curQ1, curQ2, curQ3, studentData = {}, hintUsed = false;
 
-  // 初始化遊戲並隨機抽題
-  function initGame() {
-    studentData.name = document.getElementById('userName').value || "無名工程師";
-    
-    // 第一關抽題
-    const q1 = lib1[Math.floor(Math.random() * lib1.length)];
-    studentData.s1_text = q1.text.replace(/<[^>]*>/g, ''); 
-    document.getElementById('s1-display').innerHTML = q1.text;
-    
-    // 第二關抽題
-    const q2 = lib2[Math.floor(Math.random() * lib2.length)];
-    studentData.s2_q = q2.q;
-    document.getElementById('s2-q-text').innerText = "情境：" + q2.q;
-    const optContainer = document.getElementById('s2-options');
-    optContainer.innerHTML = ""; // 清空舊選項
-    q2.opts.forEach((o, i) => {
-      const btn = document.createElement('button');
-      btn.className = "option-btn";
-      btn.innerHTML = o;
-      btn.onclick = () => {
-        studentData.s2_ans = o;
-        studentData.s2_correct = (i === q2.ans);
-        goStep(3);
-      };
-      optContainer.appendChild(btn);
+function getRandomItem(array) {
+  return array[Math.floor(Math.random() * array.length)];
+}
+
+function initGame() {
+  const nameInput = document.getElementById('userName').value.trim();
+  if (!nameInput) { alert("請輸入名字以啟動系統！"); return; }
+  studentData.name = nameInput;
+
+  curQ1 = getRandomItem(lib1); 
+  curQ2 = getRandomItem(lib2); 
+  curQ3 = getRandomItem(lib3);
+
+  document.getElementById('s1-display').innerText = "「" + curQ1.text + "」";
+  document.getElementById('s2-q-text').innerText = "情境：" + curQ2.q;
+  
+  const optBox = document.getElementById('s2-options');
+  optBox.innerHTML = "";
+  curQ2.opts.forEach((o, i) => {
+    const b = document.createElement('button');
+    b.className = "option-btn"; b.innerHTML = o;
+    b.onclick = () => { studentData.s2_ans = o; studentData.s2_correct = (i === curQ2.ans); goStep(3); };
+    optBox.appendChild(b);
+  });
+  
+  document.getElementById('s3-q-text').innerText = "原文：" + curQ3.q;
+  goStep(1);
+}
+
+function goStep(n) {
+  document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+  document.getElementById('step' + n).classList.add('active');
+}
+
+function showHint() {
+  if (hintUsed) return;
+  hintUsed = true;
+  document.getElementById('hintBtn').style.display = 'none';
+  let h = "";
+  for (let c of curQ1.text) h += curQ1.ans.includes(c) ? `<span class="highlight-error">${c}</span>` : c;
+  document.getElementById('s1-display').innerHTML = "「" + h + "」";
+}
+
+function normalize(str) {
+  if (!str) return "";
+  return str.replace(/[\s]/g, '').replace(/[？\?！\!。；：]/g, '，').replace(/，/g, ',').replace(/,+$/, '');
+}
+
+function submitGame() {
+  goStep(4);
+  document.getElementById('report-title').innerText = `📊 ${studentData.name} 的修復掃描報告`;
+
+  const u1 = document.getElementById('s1_ans1').value.trim();
+  const u2 = document.getElementById('s1_ans2').value.trim();
+  const s1Correct = [u1, u2].sort().join('') === curQ1.correct.slice().sort().join('');
+
+  const rawAns = [document.getElementById('s3_1').value, document.getElementById('s3_2').value];
+  const detailBox = document.getElementById('s3-details');
+  detailBox.innerHTML = "";
+  let s3MatchCount = 0;
+
+  rawAns.forEach((uRaw, idx) => {
+    const uNorm = normalize(uRaw);
+    const match = curQ3.solutions.find(sol => normalize(sol) === uNorm);
+    const isValid = (uNorm !== "" && match);
+    if (isValid) s3MatchCount++;
+
+    const item = document.createElement('div');
+    item.className = "comparison-item";
+    item.innerHTML = `
+      <div><strong>你的寫法 ${idx+1}：</strong> ${uRaw || "（未填）"} <span class="result-badge ${isValid?'correct':'wrong'}">${isValid?'✅ 正確':'❌ 失敗'}</span></div>
+      ${isValid ? `<span class="matched-sol">系統匹配答案：${match}</span>` : `<span style="color:#e74c3c; font-size:12px;">(無法匹配到標準斷句，請檢查位置)</span>`}
+    `;
+    detailBox.appendChild(item);
+  });
+
+  const s3Success = (s3MatchCount === 2 && normalize(rawAns[0]) !== normalize(rawAns[1]));
+
+  document.getElementById('status-summary').innerHTML = `
+    第一關 字魔挑戰：<span class="result-badge ${s1Correct?'correct':'wrong'}">${s1Correct?'✅ 成功':'❌ 失敗'}</span><br>
+    第二關 成語挑戰：<span class="result-badge ${studentData.s2_correct?'correct':'wrong'}">${studentData.s2_correct?'✅ 成功':'❌ 失敗'}</span><br>
+    第三關 標點挑戰：<span class="result-badge ${s3Success?'correct':'wrong'}">${s3Success?'✅ 成功':'❌ 失敗'}</span>
+  `;
+
+  document.getElementById('final-answers').innerHTML = `
+    <strong>📍 正確解答檢閱：</strong><br>
+    第一關答案：${curQ1.correct.join('、')}<br>
+    第二關答案：${curQ2.sol}
+  `;
+
+  document.getElementById('comparison-zone').style.display = 'block';
+  document.getElementById('final-answers').style.display = 'block';
+
+  if (typeof google !== 'undefined') {
+    google.script.run.withSuccessHandler(r => {
+      document.getElementById('loading').style.display = 'none';
+      document.getElementById('report-box').innerText = r;
+      document.getElementById('report-box').style.display = 'block';
+    }).generateAIReport({
+      name: studentData.name,
+      s1_text: curQ1.text,
+      s1_ans1: u1,
+      s1_ans2: u2,
+      s2_q: curQ2.q,
+      s2_ans: studentData.s2_ans,
+      s2_correct: studentData.s2_correct,
+      s3_text: curQ3.q
     });
-
-    // 第三關抽題
-    const q3 = lib3[Math.floor(Math.random() * lib3.length)];
-    studentData.s3_text = q3;
-    document.getElementById('s3-q-text').innerText = "原文：" + q3;
-
-    goStep(1);
+  } else {
+    // 此處已依照您的要求修改
+    document.getElementById('loading').innerHTML = "💡 完成掃描";
   }
-
-  function goStep(n) {
-    document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
-    document.getElementById('step' + n).classList.add('active');
-    if(n === 2) {
-      studentData.s1_ans1 = document.getElementById('s1_ans1').value;
-      studentData.s2_ans2 = document.getElementById('s1_ans2').value;
-    }
-  }
-
-  function toggleHint() {
-    document.querySelectorAll('.hint-highlight').forEach(el => el.classList.toggle('hint-active'));
-  }
-
-  function submitGame() {
-    goStep(4);
-    const s3_1 = document.getElementById('s3_1').value;
-    const s3_2 = document.getElementById('s3_2').value;
-    studentData.s3_ans1 = s3_1;
-    studentData.s3_ans2 = s3_2;
-
-    // 呼叫後端 GAS 函數
-    if (typeof google !== 'undefined') {
-      google.script.run
-        .withSuccessHandler(function(report) {
-          document.getElementById('loading').style.display = 'none';
-          const box = document.getElementById('report-box');
-          box.innerText = report;
-          box.style.display = 'block';
-        })
-        .withFailureHandler(function(err) {
-          document.getElementById('loading').innerText = "❌ 傳輸失敗：" + err;
-        })
-        .generateAIReport(studentData);
-    } else {
-      document.getElementById('loading').innerText = "❌ 偵測不到 Google 環境，請檢查是否從部署網址進入。";
-    }
-  }
+}
 </script>
-
 </body>
 </html>
